@@ -82,6 +82,18 @@ resourceTypes:
         loan_id:
           type: string
       type: loan_idInfo
+
+
+/heathcheck:
+  get:
+    responses:
+     200:
+      body:
+        application/json:
+          example:
+            {
+              "message": "API is live"
+            }
       
 
      
