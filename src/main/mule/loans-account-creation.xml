@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="post:\loans:application\json:boa-loans-api-config">
+        <ee:transform doc:name="initialPayload" doc:id="dce6b2d9-0d2c-41fa-b429-f644d1f07361" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="initialPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="TOKEN SERVICE API1" doc:id="f9256c0c-9e8f-4cfa-8d87-a376049df3a0" config-ref="Token_ServiceHTTP_Request_configuration" path="/api1" target="finalTokenInfo"/>
+		<set-variable value="#[vars.finalTokenInfo.final_token]" doc:name="finalToken" doc:id="cf8f6bc6-94d4-47c2-8192-18767ed5377d" variableName="finalToken"/>
+		<http:request method="POST" doc:name="CRED API CALL" doc:id="b7551dee-f4d4-40d9-8685-d6b22adeff84" config-ref="CredAPIHTTP_Request_configuration" path="/api/credit-score/validate" target="credInfo">
+			<http:body ><![CDATA[#[output application/json
+---
+{
+	"cust_id": vars.initialPayload.customer_id
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.finalToken
+}]]]></http:headers>
+		</http:request>
+		<set-variable value="#[credit_score: 750]" doc:name="dummy credInfo" doc:id="06913add-dcbd-4fe9-8133-5184e46de150" variableName="credInfo"/>
+		<choice doc:name="Choice" doc:id="84584927-cba0-4cd9-af26-f802c71d4448" >
+			<when expression="#[((vars.credInfo.credit_score default 0) as Number &gt; (700 as Number))]">
+				<ee:transform doc:name="loanApplication" doc:id="5bb6305d-da0a-4a2a-a551-484597b8e4fe">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="loanApplication"><![CDATA[%dw 2.0
+output application/json
+---
+[vars.initialPayload ++ 
+{
+	loan_id: vars.initialPayload.loan_type ++ "_" ++ uuid()
+}]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="boa-loans-storageFlow" doc:id="3fb1f7f3-9807-423c-b846-3f3ef8a7de81" name="boa-loans-storageFlow"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="8c495011-6b12-4e28-9dc6-c943457b0b6d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  customer_id: vars.initialPayload.customer_id,
+  credit_score: vars.credInfo.credit_score,
+  message: "poor credit score, not eligible"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+    </flow>
+</mule>
