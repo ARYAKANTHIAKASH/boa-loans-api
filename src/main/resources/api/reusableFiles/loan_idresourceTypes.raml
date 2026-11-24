@@ -16,6 +16,8 @@ get:
                   }
 put:
         description: To update single loan data
+        is:
+          - requestQuery
         body:
           application/json:
             example:
@@ -37,6 +39,8 @@ put:
                   }
 patch:
         description: To partially update single loan data
+        is:
+          - requestQuery
         body:
           application/json:
             example:
@@ -54,6 +58,8 @@ patch:
                   }
 delete:
         description: To close single loan
+        is:
+          - requestQuery
         responses:
           200:
             body:
