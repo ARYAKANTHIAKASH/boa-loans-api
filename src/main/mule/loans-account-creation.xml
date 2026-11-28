@@ -16,7 +16,12 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 output application/json
 ---
 payload]]></ee:set-variable>
-			</ee:variables>
+				<ee:set-variable variableName="customer_id" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.customer_id]]></ee:set-variable>
+			
+</ee:variables>
 		</ee:transform>
 		<http:request method="GET" doc:name="TOKEN SERVICE API1" doc:id="f9256c0c-9e8f-4cfa-8d87-a376049df3a0" config-ref="Token_ServiceHTTP_Request_configuration" path="/api1" target="finalTokenInfo"/>
 		<set-variable value="#[vars.finalTokenInfo.final_token]" doc:name="finalToken" doc:id="cf8f6bc6-94d4-47c2-8192-18767ed5377d" variableName="finalToken"/>
@@ -48,8 +53,23 @@ output application/json
 }]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<flow-ref doc:name="boa-loans-storageFlow" doc:id="3fb1f7f3-9807-423c-b846-3f3ef8a7de81" name="boa-loans-storageFlow"/>
-			</when>
+				<flow-ref doc:name="boa-loans-storage" doc:id="3fb1f7f3-9807-423c-b846-3f3ef8a7de81" name="boa-loans-storage"/>
+				<ee:transform doc:name="finalResponse">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  customer_id: vars.initialPayload.customer_id,
+  credit_score: vars.credInfo.credit_score,
+  loan_id: vars.loanApplication.loan_id[0],
+  message: vars.initialPayload.loan_type ++ "Loan account created successfully"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+			
+</when>
 			<otherwise >
 				<ee:transform doc:name="Transform Message" doc:id="8c495011-6b12-4e28-9dc6-c943457b0b6d" >
 					<ee:message >
@@ -65,5 +85,6 @@ output application/json
 				</ee:transform>
 			</otherwise>
 		</choice>
-    </flow>
+    
+</flow>
 </mule>

@@ -274,4 +274,8 @@ type: string]]></types:shape>
     </types:processor-declaration>
   </types:enrichment>
   <types:enrichment select="#aea754bd-fa22-428c-b34c-19770db91bbf"/>
+  <types:enrichment select="#55bdd4f5-3718-4080-a49c-6dea4680808c"/>
+  <types:enrichment select="#6cde7ee9-00b4-4f05-8ebc-290358baae14"/>
+  <types:enrichment select="#cbabb7f7-e577-4ee6-9338-f0c69aae4dac"/>
+  <types:enrichment select="#dce6b2d9-0d2c-41fa-b429-f644d1f07361"/>
 </types:mule>

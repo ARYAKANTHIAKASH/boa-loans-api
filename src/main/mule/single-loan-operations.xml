@@ -7,57 +7,80 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	  <flow name="put:\loans\(loan_type)\(loan_id):application\json:boa-loans-api-config">
-        <ee:transform doc:name="Transform Message">
+        <ee:transform doc:name="init vars" doc:id="55bdd4f5-3718-4080-a49c-6dea4680808c">
             <ee:variables>
-                <ee:set-variable variableName="loan_type">attributes.uriParams.'loan_type'</ee:set-variable>
-                <ee:set-variable variableName="loan_id">attributes.uriParams.'loan_id'</ee:set-variable>
-            </ee:variables>
+                <ee:set-variable variableName="loan_type"><![CDATA[attributes.uriParams.'loan_type']]></ee:set-variable>
+                <ee:set-variable variableName="loan_id"><![CDATA[attributes.uriParams.'loan_id']]></ee:set-variable>
+				<ee:set-variable variableName="customer_id" ><![CDATA[attributes.queryParams.customer_id]]></ee:set-variable>
+				<ee:set-variable variableName="initialPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+            
+</ee:variables>
         </ee:transform>
-        <ee:transform doc:name="Transform Message">
+        <flow-ref doc:name="boa-loans-storage" doc:id="8cbea5eb-a6e9-44bd-8c29-96038daf4019" name="boa-loans-storage"/>
+		<ee:transform doc:name="finalResponse">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-  loan_id: "GOLD_1234",
+  loan_id: vars.loan_id,
   message: "Loan info updated successfully"
 } as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
     <flow name="delete:\loans\(loan_type)\(loan_id):boa-loans-api-config">
-        <ee:transform doc:name="Transform Message">
+        <ee:transform doc:name="init vars" doc:id="6cde7ee9-00b4-4f05-8ebc-290358baae14">
             <ee:variables>
-                <ee:set-variable variableName="loan_type">attributes.uriParams.'loan_type'</ee:set-variable>
-                <ee:set-variable variableName="loan_id">attributes.uriParams.'loan_id'</ee:set-variable>
-            </ee:variables>
+                <ee:set-variable variableName="loan_type"><![CDATA[attributes.uriParams.'loan_type']]></ee:set-variable>
+                <ee:set-variable variableName="loan_id"><![CDATA[attributes.uriParams.'loan_id']]></ee:set-variable>
+				<ee:set-variable variableName="customer_id" ><![CDATA[attributes.queryParams.customer_id]]></ee:set-variable>
+				<ee:set-variable variableName="initialPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "InActive"
+}]]></ee:set-variable>
+            
+</ee:variables>
         </ee:transform>
-        <ee:transform doc:name="Transform Message">
+        <flow-ref doc:name="boa-loans-storage" doc:id="b33fba96-1f27-4557-a8e4-0d1777149558" name="boa-loans-storage"/>
+		<ee:transform doc:name="finalResponse">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-  loan_id: "GOLD_1234",
+  loan_id: vars.loan_id,
   message: "Loan account closed successfully"
 } as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
     <flow name="patch:\loans\(loan_type)\(loan_id):application\json:boa-loans-api-config">
-        <ee:transform doc:name="Transform Message">
+        <ee:transform doc:name="init vars" doc:id="cbabb7f7-e577-4ee6-9338-f0c69aae4dac">
             <ee:variables>
-                <ee:set-variable variableName="loan_type">attributes.uriParams.'loan_type'</ee:set-variable>
-                <ee:set-variable variableName="loan_id">attributes.uriParams.'loan_id'</ee:set-variable>
-            </ee:variables>
+                <ee:set-variable variableName="loan_type"><![CDATA[attributes.uriParams.'loan_type']]></ee:set-variable>
+                <ee:set-variable variableName="loan_id"><![CDATA[attributes.uriParams.'loan_id']]></ee:set-variable>
+				<ee:set-variable variableName="customer_id" ><![CDATA[attributes.queryParams.customer_id]]></ee:set-variable>
+				<ee:set-variable variableName="initialPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+            
+</ee:variables>
         </ee:transform>
-        <ee:transform doc:name="Transform Message">
+        <flow-ref doc:name="boa-loans-storage" doc:id="91e6895a-6244-4aaa-937c-972715c8761c" name="boa-loans-storage"/>
+		<ee:transform doc:name="finalResponse">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-  loan_id: "GOLD_1234",
+  loan_id: vars.loan_id,
   message: "Loan info updated successfully"
 } as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
             </ee:message>
